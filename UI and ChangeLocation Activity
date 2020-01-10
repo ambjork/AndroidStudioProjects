@@ -1,0 +1,346 @@
+FetchData:
+
+Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+
+        MainActivity.data.setText(format("%s%s%s", this.weatherDescription, ", temperature is ", this.temperature));
+
+
+
+
+        }package com.grupp17.test;
+
+
+
+
+
+
+
+
+
+
+
+---------------------SLUT PÅ FETCHDATA--------------------------------
+
+
+MAINACTIVITY:
+
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
+public class MainActivity extends AppCompatActivity {
+    Button changeLocationButton;
+    public static TextView data;
+
+    private TextView dateTimeDisplay;
+    private Calendar calendar;
+    private SimpleDateFormat dateFormat;
+    private String date;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        data = findViewById(R.id.Fetchdata);
+        //changeLocationButton = (Button) findViewById(R.id.changeLocationButton);
+
+        ImageView image = new ImageView(this);
+        // image = findViewById(int);
+
+
+        dateTimeDisplay = findViewById(R.id.text_date_display);
+
+        calendar = Calendar.getInstance();
+        dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy");
+        date = dateFormat.format(calendar.getTime());
+        dateTimeDisplay.setText(date);
+
+
+
+        final Button ChangeLocationButton = findViewById(R.id.changeLocationButton);
+        ChangeLocationButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                //add your code here..
+                Intent myIntent = new Intent(MainActivity.this, ChangeLocation.class);
+                //myIntent.putExtra("key", null); //Optional parameters
+                myIntent.setAction("com.test.app.ChangeLocation");
+                startActivity(myIntent);
+
+
+                WindowManager.LayoutParams params = getWindow().getAttributes();
+                params.screenBrightness = 0;
+                getWindow().setAttributes(params);
+                Toast.makeText(getApplicationContext(),"Button Clicked",Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+        //om trycker på knappen så starta ny activity
+
+
+
+
+        FetchData process = new FetchData();
+        //ImageSetter imageset = new ImageSetter();
+        process.execute();
+        //imageset.execute();
+
+
+
+    }
+}
+
+
+// https://api.myjson.com/bins/ktxhk   FETCH MEEEE
+
+
+
+----------------------- SLUT PÅ MAIN ACTIVITY --------------------------------------------
+
+CHANGELOCATION
+
+package com.grupp17.test;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Spinner;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class ChangeLocation extends AppCompatActivity {
+
+    String locationValue;
+
+    //nånting som har att göra med array-listorna
+    ListView listView;
+    Spinner spinner;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_change_location);
+
+            Intent intent = getIntent();
+            //String value = intent.getStringExtra(); //if it's a string you stored.
+
+        //hämta min plats med geolocation
+
+        // välj från en rullista
+
+        final Button setLocationButton = findViewById(R.id.setLocationButton);
+        setLocationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //välj stad som default
+                Intent myIntent = new Intent(ChangeLocation.this, MainActivity.class);
+                //myIntent.putExtra("key", null); //Optional parameters
+                myIntent.setAction(".MainActivity");
+                startActivity(myIntent);
+            }
+        });
+
+        // Initializing a String Array
+        String[] locations = findViewById(R.array.locations_array);
+
+        final Spinner spinner = findViewById(R.id.spinner);
+
+        final List<String> locationsList = new ArrayList<>(Arrays.asList(locations));
+
+        // Initializing an ArrayAdapter
+        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
+                this,android.R.layout.simple_spinner_item,locationsList);
+
+        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinner.setAdapter(spinnerArrayAdapter);
+
+        setLocationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Select the Spinner element at index position 2
+                // It will select third element/item from Spinner
+                spinner.setSelection(2);
+            }
+        });
+
+
+    }
+
+
+
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+
+    }
+
+}
+
+
+------------------------------SLUT PÅ CHANGELOCATION ------------------------------------------------
+
+
+
+CHANGE LOCATION ACTIVITY XML
+
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ChangeLocationActivity"
+    android:background="@drawable/weather_icon">
+
+    <Button
+        android:id="@+id/setLocationButton"
+        android:layout_width="132dp"
+        android:layout_height="71dp"
+        android:layout_marginBottom="50dp"
+        android:text="Set location"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="409dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:entries="@array/locations_array"
+        android:foreground="@color/common_google_signin_btn_text_dark_disabled"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose your city"
+        android:textAlignment="textStart"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+-----------------------------SLUT PÅ CHANGE LOCATION XML-----------------------------------
+
+
+STRING.XML
+
+
+<resources>
+    <string name="app_name">Weather App</string>
+    <string name="GetWeatherInfo">No data yet!</string>
+    <string name="Date"></string>
+    <string name="changeLocationButton">Change location</string>
+
+
+        <string-array name="locations_array">
+            <item>Gothenburg</item>
+            <item>Stockholm</item>
+            <item>Malmö</item>
+            <item>Jönköping</item>
+            <item>Umeå</item>
+            <item>Karlstad</item>
+            <item>Sundsvall</item>
+            <item>Kristianstad</item>
+        </string-array>
+
+        <string name="locationsarray">
+            <item>Gothenburg</item>
+            <item>Stockholm</item>
+            <item>Malmö</item>
+            <item>Jönköping</item>
+            <item>Umeå</item>
+            <item>Karlstad</item>
+            <item>Sundsvall</item>
+            <item>Kristianstad</item>
+        </string>
+</resources>
+
+
+
+-------------------------------SLUT PÅ STRING XML-------------------------------------------
+
+
+
+
+ANDROID MANIFEST
+
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.grupp17.test">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity
+             android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".ChangeLocation" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>
+
+
+
+
+
+
+
+
